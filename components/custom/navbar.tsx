@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { auth, signOut } from "@/app/(auth)/auth";
 
+import { AnonymousToggle } from "./anonymous-toggle";
 import { History } from "./history";
 import { SlashIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
@@ -32,8 +33,8 @@ export const Navbar = async () => {
             <div className="text-zinc-500">
               <SlashIcon size={16} />
             </div>
-            <div className="text-sm dark:text-zinc-300 truncate w-28 md:w-fit">
-              Next.js Gemini Chatbot
+            <div className="text-sm dark:text-zinc-300 truncate w-40 md:w-fit">
+              Psyk Mental Health Companion
             </div>
           </div>
         </div>
@@ -51,6 +52,9 @@ export const Navbar = async () => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <ThemeToggle />
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <AnonymousToggle />
               </DropdownMenuItem>
               <DropdownMenuItem className="p-1 z-50">
                 <form

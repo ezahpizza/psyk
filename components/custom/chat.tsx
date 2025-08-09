@@ -17,16 +17,20 @@ export function Chat({
   id: string;
   initialMessages: Array<Message>;
 }) {
-  const { messages, handleSubmit, input, setInput, append, isLoading, stop } =
-    useChat({
+  const { messages, handleSubmit, input, setInput, append, isLoading, stop } = useChat({
+    id,
+    body: {
       id,
-      body: { id },
-      initialMessages,
-      maxSteps: 10,
-      onFinish: () => {
-        window.history.replaceState({}, "", `/chat/${id}`);
-      },
-    });
+      anonymous:
+        typeof window !== "undefined" && localStorage.getItem("anonymousMode") === "true",
+      anonId: typeof window !== "undefined" ? localStorage.getItem("anonId") : undefined,
+    },
+    initialMessages,
+    maxSteps: 10,
+    onFinish: () => {
+      window.history.replaceState({}, "", `/chat/${id}`);
+    },
+  });
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();

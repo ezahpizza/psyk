@@ -1,8 +1,9 @@
 "use server";
 
+import { genSaltSync, hashSync } from "bcrypt-ts";
 import { z } from "zod";
 
-import { createUser, getUser } from "@/db/queries";
+import { createUser, getUser } from "@/lib/models";
 
 import { signIn } from "./auth";
 
@@ -66,7 +67,9 @@ export const register = async (
     if (user) {
       return { status: "user_exists" } as RegisterActionState;
     } else {
-      await createUser(validatedData.email, validatedData.password);
+    const salt = genSaltSync(10);
+    const hashed = hashSync(validatedData.password, salt);
+    await createUser(validatedData.email, hashed);
       await signIn("credentials", {
         email: validatedData.email,
         password: validatedData.password,

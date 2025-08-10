@@ -51,6 +51,19 @@ export function generateUUID(): string {
   });
 }
 
+// Prefer crypto.randomUUID when available (modern browsers / Node 18+), fallback to pseudo version above
+export function safeRandomUUID(): string {
+  try {
+    const g: any = typeof globalThis !== "undefined" ? (globalThis as any) : undefined;
+    if (g?.crypto && typeof g.crypto.randomUUID === "function") {
+      return g.crypto.randomUUID();
+    }
+  } catch {
+    // ignore and fallback
+  }
+  return generateUUID();
+}
+
 function addToolMessageToChat({
   toolMessage,
   messages,

@@ -1,28 +1,22 @@
+"use client";
+import React from "react";
 import Image from "next/image";
-import Link from "next/link";
-
-import { auth, signOut } from "@/app/(auth)/auth";
+import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 
 import { AnonymousToggle } from "./anonymous-toggle";
 import { History } from "./history";
 import { SlashIcon } from "./icons";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
-export const Navbar = async () => {
-  let session = await auth();
-
+export const Navbar = () => {
+  const { user } = useUser();
   return (
     <>
       <div className="bg-background fixed top-0 left-0 w-full py-2 px-3 flex flex-row items-center justify-between z-30 gap-2 md:gap-4">
         <div className="flex flex-row gap-2 md:gap-3 items-center min-w-0">
-          <History user={session?.user} />
+          <History user={user ? { id: user.id, email: user.primaryEmailAddress?.emailAddress } : undefined} />
           <AnonymousToggle />
         </div>
         <div className="flex flex-row gap-2 items-center min-w-0 flex-1 justify-center md:justify-start">
@@ -41,49 +35,34 @@ export const Navbar = async () => {
           </div>
         </div>
 
-        {session ? (
+        <SignedIn>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 className="py-1.5 px-2 h-fit font-normal"
                 variant="secondary"
               >
-                {session.user?.email}
+                <UserButton afterSignOutUrl="/" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <ThemeToggle />
               </DropdownMenuItem>
-              <DropdownMenuItem className="p-1 z-50">
-                <form
-                  className="w-full"
-                  action={async () => {
-                    "use server";
-
-                    await signOut({
-                      redirectTo: "/",
-                    });
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="w-full text-left px-1 py-0.5 text-red-500"
-                  >
-                    Sign out
-                  </button>
-                </form>
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
+        </SignedIn>
+        <SignedOut>
           <div className="flex flex-row gap-2 items-center">
             <ThemeToggle />
-            <Button className="py-1.5 px-2 h-fit font-normal text-white" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
+            <SignInButton mode="modal">
+              <Button className="py-1.5 px-2 h-fit font-normal text-white">Login</Button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <Button className="py-1.5 px-2 h-fit font-normal" variant="outline">Sign Up</Button>
+            </SignUpButton>
           </div>
-        )}
+        </SignedOut>
       </div>
     </>
   );

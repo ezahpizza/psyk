@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { safeRandomUUID } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 
@@ -13,7 +14,7 @@ export function AnonymousToggle() {
     setEnabled(next);
     localStorage.setItem("anonymousMode", String(next));
     if (next && !localStorage.getItem("anonId")) {
-      localStorage.setItem("anonId", crypto.randomUUID());
+      localStorage.setItem("anonId", safeRandomUUID());
     }
     // Notify other components (History, Chat etc.) that mode changed
     window.dispatchEvent(new Event("anonymous-mode-changed"));

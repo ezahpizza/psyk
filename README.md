@@ -1,28 +1,32 @@
-# Psyk – Mental Health Companion Chatbot
+# Psyk
 
-Psyk is an empathetic mental health companion built with Next.js (App Router), Vercel AI SDK (Gemini), Tailwind + shadcn/ui, NextAuth (credentials), and MongoDB via Mongoose. It supports two modes:
+Psyk is an empathetic mental health assistance platform built with Next.js, Vercel AI SDK, Tailwind + shadcn/ui, Clerk auth, and MongoDB via Mongoose. It supports two modes:
 
 1. Authenticated mode – chats stored under your user account.
 2. Anonymous mode – chats stored separately under a locally generated anonId (no PII stored).
 
 ## Key Features
 
-- Empathetic system prompt with safety + non‑diagnostic disclaimer.
-- Anonymous toggle (persisted in localStorage) – switch anytime.
-- MongoDB Atlas (Mongoose) replaces previous Postgres/Drizzle stack.
-- Streaming responses (streamText) with minimal UI latency.
-- File upload support (optional – requires Blob token if enabled).
+- Anonymous toggle – switch anytime.
+- Streaming responses with minimal UI latency.
+- File upload support .
 
 ## Environment Variables
 
 Copy `.env.example` to `.env.local` and fill:
 
+```env
+
 MONGODB_URI=your_atlas_connection_string
 GOOGLE_GENERATIVE_AI_API_KEY=your_key
 AUTH_SECRET=generated_secret
 BLOB_READ_WRITE_TOKEN=optional_if_using_file_uploads
+TAVILY_API_KEY=your_tavily_api_key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+```
 
-Remove any old Postgres variables – no longer required.
+Refer to Clerk dashboard for the correct keys.
 
 ## Development
 
@@ -34,7 +38,6 @@ Open http://localhost:3000. Toggle Anonymous mode from the user menu (or login t
 ## Deployment Notes
 
 - Ensure `MONGODB_URI` & `GOOGLE_GENERATIVE_AI_API_KEY` are set in Vercel dashboard.
-- No migration step needed (Drizzle removed).
 
 ## Safety & Disclaimer
 

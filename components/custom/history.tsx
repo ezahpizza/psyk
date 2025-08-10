@@ -3,12 +3,11 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import cx from "classnames";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { User } from "next-auth";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
-import { fetcher, getTitleFromChat } from "@/lib/utils";
+import { fetcher, getTitleFromChat, safeRandomUUID } from "@/lib/utils";
 
 import { InfoIcon, MenuIcon, MoreHorizontalIcon, PencilEditIcon, TrashIcon } from "./icons";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
@@ -18,7 +17,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 
 interface Chat { id: string; userId?: string; anonId?: string; messages: any[] }
 
-export const History = ({ user }: { user: User | undefined }) => {
+export interface MinimalUser { id?: string; email?: string | null }
+export const History = ({ user }: { user: MinimalUser | undefined }) => {
   const { id } = useParams();
   const pathname = usePathname();
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
@@ -30,7 +30,7 @@ export const History = ({ user }: { user: User | undefined }) => {
       setAnonymousMode(mode);
       let stored = localStorage.getItem("anonId");
       if (mode && !stored) {
-        stored = crypto.randomUUID();
+        stored = safeRandomUUID();
         localStorage.setItem("anonId", stored);
       }
       setAnonId(stored);

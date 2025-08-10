@@ -2,7 +2,7 @@ import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { auth } from "@/app/(auth)/auth";
+import { auth } from "@clerk/nextjs/server";
 
 const FileSchema = z.object({
   file: z
@@ -22,7 +22,7 @@ const FileSchema = z.object({
 export async function POST(request: Request) {
   const session = await auth();
 
-  if (!session) {
+  if (!session?.userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -57,10 +57,10 @@ export async function POST(request: Request) {
       });
 
       return NextResponse.json(data);
-    } catch (error) {
+  } catch {
       return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to process request" },
       { status: 500 },

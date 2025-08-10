@@ -7,7 +7,6 @@ import { ReactNode } from "react";
 import { BotIcon, UserIcon } from "./icons";
 import { Markdown } from "./markdown";
 import { PreviewAttachment } from "./preview-attachment";
-import { Weather } from "./weather";
 
 export const Message = ({
   chatId,
@@ -43,26 +42,38 @@ export const Message = ({
           <div className="flex flex-col gap-4">
             {toolInvocations.map((toolInvocation) => {
               const { toolName, toolCallId, state } = toolInvocation;
-
-              if (state === "result") {
-                const { result } = toolInvocation;
-
+              if (state !== "result") {
                 return (
-                  <div key={toolCallId}>
-                    {toolName === "getWeather" ? (
-                      <Weather weatherAtLocation={result} />
-                    ) : (
-                      <div>{JSON.stringify(result, null, 2)}</div>
-                    )}
-                  </div>
-                );
-              } else {
-                return (
-                  <div key={toolCallId} className="skeleton">
-                    {toolName === "getWeather" ? <Weather /> : null}
+                  <div key={toolCallId} className="text-xs text-zinc-500 italic">
+                    {toolName === "tavilySearch" ? "Searching sources..." : `Running ${toolName}...`}
                   </div>
                 );
               }
+              const { result } = toolInvocation as any;
+              if (toolName === "tavilySearch") {
+                const results = result?.results || [];
+                return (
+                  <div key={toolCallId} className="flex flex-col gap-2 rounded-md border p-3 bg-muted/50">
+                    <div className="text-xs uppercase tracking-wide text-zinc-500">Sources</div>
+                    <ul className="list-disc list-inside flex flex-col gap-1 text-sm">
+                      {results.slice(0,4).map((r: any, idx: number) => (
+                        <li key={idx} className="truncate">
+                          <a href={r.url} target="_blank" rel="noopener noreferrer" className="underline decoration-dotted">
+                            {r.title || r.url}
+                          </a>
+                          {r.snippet && <span className="text-zinc-500"> – {r.snippet}</span>}
+                        </li>
+                      ))}
+                      {results.length === 0 && <li className="text-zinc-500">No results found</li>}
+                    </ul>
+                  </div>
+                );
+              }
+              return (
+                <div key={toolCallId} className="text-xs text-zinc-500">
+                  {JSON.stringify(result)}
+                </div>
+              );
             })}
           </div>
         )}

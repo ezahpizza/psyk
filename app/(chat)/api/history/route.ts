@@ -1,4 +1,4 @@
-import { auth } from "@/app/(auth)/auth";
+import { auth } from "@clerk/nextjs/server";
 import { getChatsByUserId, getChatsByAnonId } from "@/lib/models";
 
 export async function GET(request: Request) {
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     return Response.json(chats);
   }
   const session = await auth();
-  if (!session?.user?.id) return Response.json("Unauthorized!", { status: 401 });
-  const chats = await getChatsByUserId(session.user.id);
+  if (!session?.userId) return Response.json("Unauthorized!", { status: 401 });
+  const chats = await getChatsByUserId(session.userId);
   return Response.json(chats);
 }

@@ -18,8 +18,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" suppressHydrationWarning>
+      {/* suppressHydrationWarning prevents noisy mismatches when next-themes adjusts the class (light/dark) or browser extensions inject attributes */}
+      <body className="antialiased" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

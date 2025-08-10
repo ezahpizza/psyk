@@ -20,22 +20,24 @@ export const Navbar = async () => {
 
   return (
     <>
-      <div className="bg-background absolute top-0 left-0 w-dvw py-2 px-3 justify-between flex flex-row items-center z-30">
-        <div className="flex flex-row gap-3 items-center">
+      <div className="bg-background fixed top-0 left-0 w-full py-2 px-3 flex flex-row items-center justify-between z-30 gap-2 md:gap-4">
+        <div className="flex flex-row gap-2 md:gap-3 items-center min-w-0">
           <History user={session?.user} />
-          <div className="flex flex-row gap-2 items-center">
-            <Image
-              src="/images/gemini-logo.png"
-              height={20}
-              width={20}
-              alt="gemini logo"
-            />
-            <div className="text-zinc-500">
-              <SlashIcon size={16} />
-            </div>
-            <div className="text-sm dark:text-zinc-300 truncate w-40 md:w-fit">
-              Psyk Mental Health Companion
-            </div>
+          <AnonymousToggle />
+        </div>
+        <div className="flex flex-row gap-2 items-center min-w-0 flex-1 justify-center md:justify-start">
+          <Image
+            src="/images/gemini-logo.png"
+            height={20}
+            width={20}
+            alt="gemini logo"
+            className="shrink-0"
+          />
+          <div className="text-zinc-500 shrink-0">
+            <SlashIcon size={16} />
+          </div>
+          <div className="text-xs md:text-sm dark:text-zinc-300 truncate w-32 md:w-auto">
+            Psyk Mental Health Companion
           </div>
         </div>
 
@@ -52,9 +54,6 @@ export const Navbar = async () => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <ThemeToggle />
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <AnonymousToggle />
               </DropdownMenuItem>
               <DropdownMenuItem className="p-1 z-50">
                 <form
@@ -78,9 +77,12 @@ export const Navbar = async () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button className="py-1.5 px-2 h-fit font-normal text-white" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
+          <div className="flex flex-row gap-2 items-center">
+            <ThemeToggle />
+            <Button className="py-1.5 px-2 h-fit font-normal text-white" asChild>
+              <Link href="/login">Login</Link>
+            </Button>
+          </div>
         )}
       </div>
     </>

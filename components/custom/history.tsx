@@ -7,7 +7,9 @@ import { User } from "next-auth";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+
 import { fetcher, getTitleFromChat } from "@/lib/utils";
+
 import { InfoIcon, MenuIcon, MoreHorizontalIcon, PencilEditIcon, TrashIcon } from "./icons";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
@@ -23,14 +25,23 @@ export const History = ({ user }: { user: User | undefined }) => {
   const [anonymousMode, setAnonymousMode] = useState(false);
   const [anonId, setAnonId] = useState<string | null>(null);
   useEffect(() => {
-    const mode = localStorage.getItem("anonymousMode") === "true";
-    setAnonymousMode(mode);
-    let stored = localStorage.getItem("anonId");
-    if (mode && !stored) {
-      stored = crypto.randomUUID();
-      localStorage.setItem("anonId", stored);
+    function updateFromStorage() {
+      const mode = localStorage.getItem("anonymousMode") === "true";
+      setAnonymousMode(mode);
+      let stored = localStorage.getItem("anonId");
+      if (mode && !stored) {
+        stored = crypto.randomUUID();
+        localStorage.setItem("anonId", stored);
+      }
+      setAnonId(stored);
     }
-    setAnonId(stored);
+    updateFromStorage();
+    window.addEventListener("anonymous-mode-changed", updateFromStorage);
+    window.addEventListener("storage", updateFromStorage);
+    return () => {
+      window.removeEventListener("anonymous-mode-changed", updateFromStorage);
+      window.removeEventListener("storage", updateFromStorage);
+    };
   }, []);
   const { data: history, isLoading, mutate } = useSWR<Array<Chat>>(
     anonymousMode ? (anonId ? `/api/history?anonId=${anonId}` : null) : user ? "/api/history" : null,

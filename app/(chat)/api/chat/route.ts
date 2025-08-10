@@ -20,11 +20,12 @@ export async function POST(request: Request) {
     model: google('gemini-2.5-flash'),
     system: `You are Psyk, an empathetic mental health companion. Goals: listen actively, validate feelings, reflect mood, offer gentle coping strategies, suggest healthy routines, and explain mental health concepts accessibly. Limitations: you are not a therapist and cannot diagnose, prescribe, or replace professional care. Always include a brief disclaimer when giving advice that sounds medical or urgent (e.g. "I'm not a professional, but..."). Encourage seeking professional or emergency help if user expresses self-harm, harm to others, or severe distress. Keep tone warm, concise, and stigma-free. Date: ${new Date().toLocaleDateString()}.`,
     messages: coreMessages,
-    onFinish: async ({ responseMessages }) => {
+  onFinish: async ({ responseMessages }) => {
       try {
+        // Persist raw core + response messages; casting to Message[] for storage
         await saveChat({
           id,
-          messages: [...coreMessages, ...responseMessages],
+          messages: [...coreMessages, ...responseMessages] as any,
           userId: !anonymous ? session?.user?.id : undefined,
           anonId: anonymous ? anonId : undefined,
         });
@@ -47,11 +48,13 @@ export async function DELETE(request: Request) {
   try {
     const chat = await getChatById(id);
     if (!chat) return new Response("Not Found", { status: 404 });
-    const isOwner = (session?.user?.id && chat.userId === session.user.id) || (anonId && chat.anonId === anonId);
-    if (!isOwner) return new Response("Unauthorized", { status: 401 });
-    await deleteChatById(id, { userId: session?.user?.id, anonId: anonId ?? undefined });
+    const isOwner = !!session?.user?.id && 'userId' in chat && chat.userId === session.user.id;
+    const isAnon = !!anonId && 'anonId' in chat && chat.anonId === anonId;
+    if (!isOwner && !isAnon) return new Response("Unauthorized", { status: 401 });
+    await deleteChatById(id, { userId: isOwner ? session?.user?.id : undefined, anonId: isAnon ? anonId ?? undefined : undefined });
     return new Response("Chat deleted", { status: 200 });
-  } catch {
+  } catch (e) {
+    console.error("Failed to delete chat", e);
     return new Response("Server error", { status: 500 });
   }
 }

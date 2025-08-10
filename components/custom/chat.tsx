@@ -46,16 +46,20 @@ export function Chat({
         >
           {messages.length === 0 && <Overview />}
 
-          {messages.map((message) => (
-            <PreviewMessage
-              key={message.id}
-              chatId={id}
-              role={message.role}
-              content={message.content}
-              attachments={message.experimental_attachments}
-              toolInvocations={message.toolInvocations}
-            />
-          ))}
+          {messages.map((message, idx) => {
+            // Some persisted core messages may lack an 'id' field; provide a stable fallback
+            const safeKey = (message as any).id || `${message.role}-${idx}`;
+            return (
+              <PreviewMessage
+                key={safeKey}
+                chatId={id}
+                role={message.role}
+                content={message.content}
+                attachments={message.experimental_attachments}
+                toolInvocations={message.toolInvocations}
+              />
+            );
+          })}
 
           <div
             ref={messagesEndRef}
